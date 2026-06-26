@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,394 +9,363 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    html { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="white"/></svg>') 12 12, auto; }
-    
-    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
 
-    /* SPLASH SCREEN */
+    /* ── CUSTOM CURSOR (desktop only) ── */
+    @media (pointer: fine) {
+      *, *::before, *::after { cursor: none !important; }
+      #cursor-dot {
+        position: fixed;
+        top: 0; left: 0;
+        width: 8px; height: 8px;
+        background: #fff;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 99999;
+        transform: translate(-50%, -50%);
+        transition: transform 0.08s ease, opacity 0.2s ease;
+        box-shadow: 0 0 6px rgba(255,255,255,0.6);
+      }
+    }
+    @media (pointer: coarse) { #cursor-dot { display: none; } }
+
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; overflow-x: hidden; }
+
+    /* ── SPLASH ── */
     .splash-screen {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: #0a0a0a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
       z-index: 9999;
-      animation: fadeOutSplash 0.6s ease 3s forwards;
+      transition: opacity 0.6s ease;
     }
-
-    .splash-content {
-      text-align: center;
-      animation: fadeInUp 0.8s ease;
-    }
-
+    .splash-screen.hiding { opacity: 0; pointer-events: none; }
+    .splash-content { text-align: center; animation: fadeInUp 0.8s ease both; }
     .splash-text {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(1.5rem, 5vw, 3rem);
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: #fff;
-      margin-bottom: 30px;
-      font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase; color: #fff;
+      margin-bottom: 12px; font-weight: 700;
     }
-
     .splash-subtitle {
-      font-size: clamp(0.8rem, 3vw, 1.2rem);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 50px;
+      font-size: clamp(0.8rem, 3vw, 1.1rem);
+      letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); margin-bottom: 48px;
     }
-
     .splash-click {
-      font-size: 0.9rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
+      font-size: 0.82rem; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
       animation: blink-text 1.5s ease-in-out infinite;
     }
+    @keyframes blink-text { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-    @keyframes blink-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeOutSplash { to { opacity: 0; pointer-events: none; } }
+    /* ── MAIN CONTENT ── */
+    .main-content { opacity: 0; pointer-events: none; transition: opacity 0.6s ease; }
+    .main-content.visible { opacity: 1; pointer-events: all; }
 
-    /* MAIN CONTENT */
-    .main-content {
-      opacity: 0;
-      pointer-events: none;
-      animation: fadeIn 0.6s ease 3.2s forwards;
-    }
-
-    @keyframes fadeIn { to { opacity: 1; pointer-events: all; } }
-
+    /* ── VISIT COUNTER ── */
     .visit-counter {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 16px;
-      padding: 16px 24px;
+      position: fixed; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 14px; padding: 10px 16px;
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.8);
-      z-index: 1000;
-      animation: slideIn 0.6s ease;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.7); z-index: 1000;
+      display: flex; align-items: center; gap: 8px;
       backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      animation: slideIn 0.6s ease both;
     }
-    
-    .visit-icon {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      flex-shrink: 0;
-      filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
-    }
-    
-    .visit-number {
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.1rem;
-      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    @keyframes slideIn { from { transform: translateX(150px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .visit-icon { width: 22px; height: 22px; object-fit: contain; }
+    .visit-number { color: #fff; font-weight: 700; font-size: 0.95rem; }
+    @keyframes slideIn { from{transform:translateX(120px);opacity:0} to{transform:translateX(0);opacity:1} }
 
+    /* ── MUSIC BAR ── */
     .music-bar {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
+      display: inline-flex; align-items: center; gap: 12px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 100px;
-      padding: 10px 20px 10px 14px;
+      border-radius: 100px; padding: 10px 20px 10px 14px;
       margin-top: 22px;
-      animation: fadeUp 0.8s 0.3s ease both;
     }
     .music-info { display: flex; flex-direction: column; line-height: 1.3; text-align: left; }
-    .music-title { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
-    .music-artist { font-size: 0.6rem; color: rgba(255,255,255,0.35); }
+    .music-title { font-family: 'Orbitron', sans-serif; font-size: 0.63rem; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+    .music-artist { font-size: 0.58rem; color: rgba(255,255,255,0.35); }
     .music-btn {
-      width: 42px; height: 42px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.08);
-      color: #fff; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      transition: background 0.2s, transform 0.15s;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.15s; flex-shrink: 0;
     }
-    .music-btn:hover { background: rgba(255,255,255,0.18); transform: scale(1.08); }
-    .music-btn:active { transform: scale(0.96); }
-    .music-btn svg { width: 16px; height: 16px; }
+    .music-btn:hover { background: rgba(255,255,255,0.15); transform: scale(1.08); }
+    .music-btn svg { width: 14px; height: 14px; }
     .music-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 1.4s ease-in-out infinite; flex-shrink: 0; }
-    .music-dot.paused { animation: none; opacity: 0.25; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+    .music-dot.paused { animation: none; opacity: 0.2; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
 
-    header { text-align: center; padding: 50px 20px 30px; position: relative; overflow: hidden; }
-    header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%); pointer-events: none; }
+    /* ── HEADER ── */
+    header { text-align: center; padding: 60px 20px 30px; position: relative; overflow: hidden; }
+    header::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,255,255,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
     .logo-wrap { display: inline-block; margin-bottom: 20px; }
-    .logo-wrap img { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 0 24px rgba(255,255,255,0.25)); animation: floatLogo 4s ease-in-out infinite; }
-    @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    header h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 700; letter-spacing: 8px; text-transform: uppercase; color: #fff; margin-bottom: 8px; animation: fadeUp 0.8s ease both; }
-    header p { font-size: 0.85rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.4); animation: fadeUp 0.8s 0.15s ease both; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    .divider { width: 60px; height: 1px; background: rgba(255,255,255,0.2); margin: 0 auto 50px; }
-    
-    .section { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; }
-    .section-title { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.35); text-align: center; margin-bottom: 60px; }
-    
-    /* MAPA MENTAL CIRCULAR */
-    .mental-map {
+    .logo-wrap img {
+      width: 90px; height: 90px; object-fit: contain;
+      filter: drop-shadow(0 0 24px rgba(255,255,255,0.2));
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+    @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 6vw, 3.5rem);
+      font-weight: 700; letter-spacing: 8px; text-transform: uppercase;
+      color: #fff; margin-bottom: 8px;
+    }
+    header p { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+    .divider { width: 50px; height: 1px; background: rgba(255,255,255,0.15); margin: 0 auto 56px; }
+
+    /* ── SECTION ── */
+    .section { max-width: 1100px; margin: 0 auto; padding: 0 20px 80px; }
+    .section-title {
+      font-family: 'Orbitron', sans-serif; font-size: 0.68rem;
+      letter-spacing: 4px; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); text-align: center; margin-bottom: 56px;
+    }
+
+    /* ════════════════════════════════
+       DESKTOP: circular map layout
+    ════════════════════════════════ */
+    .map-container {
       position: relative;
-      width: 100%;
-      max-width: 700px;
+      width: 680px; height: 680px;
       margin: 0 auto;
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .center-member {
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      cursor: pointer;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 10;
+    /* Center card */
+    .center-card {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 190px; height: 190px;
+      z-index: 10; transition: width 0.45s cubic-bezier(0.4,0,0.2,1), height 0.45s cubic-bezier(0.4,0,0.2,1);
     }
-
-    .center-member:hover {
-      transform: scale(1.05);
-    }
-
-    .center-member.expanded {
-      width: 300px;
-      height: 300px;
-      z-index: 100;
-    }
+    .center-card { cursor: pointer; }
+    .center-card.expanded { width: 290px; height: 290px; z-index: 100; }
 
     .center-avatar {
-      width: 100%;
-      height: 100%;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.05);
-      border: 2px solid rgba(255,255,255,0.2);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 40px rgba(255,255,255,0.1);
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%; height: 100%;
+      border-radius: 22px; border: 2px solid rgba(255,255,255,0.18);
+      overflow: hidden; background: rgba(255,255,255,0.04);
+      box-shadow: 0 0 40px rgba(255,255,255,0.08);
+      transition: border-color 0.45s, box-shadow 0.45s;
     }
-
-    .center-member.expanded .center-avatar {
-      border-color: rgba(255,255,255,0.6);
-      box-shadow: 0 0 80px rgba(255,255,255,0.3);
+    .center-card.expanded .center-avatar {
+      border-color: rgba(255,255,255,0.5);
+      box-shadow: 0 0 70px rgba(255,255,255,0.2);
     }
+    .center-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .center-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .center-name {
-      position: absolute;
-      bottom: -50px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: #fff;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-    }
-
-    .center-member.expanded .center-name {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .center-desc {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 20px;
-      padding: 30px 20px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-    }
-
-    .center-member.expanded .center-desc {
-      max-height: 500px;
-      opacity: 1;
-    }
-
-    .center-quote {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.9);
-      font-style: italic;
-      margin-bottom: 20px;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .center-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .center-tag {
-      font-size: 0.65rem;
-      font-family: 'Orbitron', sans-serif;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 100px;
-      padding: 5px 12px;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .back-btn {
-      align-self: flex-end;
-      padding: 8px 16px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 8px;
-      background: rgba(255,255,255,0.05);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .back-btn:hover {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-    }
-
-    /* MEMBROS EM CÍRCULO */
-    .circle-members {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      inset: 0;
-    }
-
-    .circle-member {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      cursor: pointer;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .circle-member.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .member-avatar {
-      width: 100%;
-      height: 100%;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1.5px solid rgba(255,255,255,0.15);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .circle-member:hover .member-avatar {
-      border-color: rgba(255,255,255,0.4);
-      box-shadow: 0 0 30px rgba(255,255,255,0.15);
-      transform: scale(1.05);
-    }
-
-    .member-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .member-emoji {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      font-size: 0.9rem;
-      line-height: 1;
-    }
-
-    .member-name {
-      position: absolute;
-      bottom: -35px;
-      left: 50%;
+    .center-label {
+      position: absolute; bottom: -40px; left: 50%;
       transform: translateX(-50%);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-      white-space: nowrap;
-      transition: color 0.3s ease;
+      font-family: 'Orbitron', sans-serif; font-size: 0.95rem;
+      letter-spacing: 3px; text-transform: uppercase; font-weight: 700;
+      white-space: nowrap; transition: opacity 0.3s ease;
+    }
+    .center-card.expanded .center-label { opacity: 0; pointer-events: none; }
+
+    /* Info overlay */
+    .center-info {
+      position: absolute; inset: 0;
+      background: rgba(8,8,8,0.97);
+      border-radius: 22px; border: 2px solid rgba(255,255,255,0.2);
+      padding: 22px 18px 16px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    }
+    .center-card.expanded .center-info { opacity: 1; pointer-events: all; }
+
+    .info-quote {
+      font-size: 0.8rem; line-height: 1.65;
+      color: rgba(255,255,255,0.85); font-style: italic; text-align: center;
+    }
+    .info-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .info-tag {
+      font-size: 0.58rem; font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
+      padding: 4px 11px; background: rgba(255,255,255,0.04);
+    }
+    .back-btn {
+      padding: 7px 16px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.58rem;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      transition: all 0.2s ease; align-self: flex-end;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* Orbit members */
+    .orbit-member {
+      position: absolute;
+      width: 110px;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.4s ease, transform 0.35s ease;
+    }
+    .orbit-member { cursor: pointer; }
+    .orbit-member.hidden {
+      opacity: 0; pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.85);
+    }
+    .orbit-avatar {
+      width: 110px; height: 110px;
+      border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.14);
+      overflow: hidden; background: rgba(255,255,255,0.04);
+      position: relative; transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    }
+    .orbit-member:hover .orbit-avatar {
+      border-color: rgba(255,255,255,0.38);
+      box-shadow: 0 0 28px rgba(255,255,255,0.12);
+      transform: scale(1.06);
+    }
+    .orbit-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .orbit-emoji { position: absolute; top: 5px; right: 6px; font-size: 0.85rem; line-height: 1; }
+    .orbit-name {
+      font-family: 'Orbitron', sans-serif; font-size: 0.6rem;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); text-align: center;
+      margin-top: 10px; white-space: nowrap;
+      transition: color 0.25s;
+    }
+    .orbit-member:hover .orbit-name { color: #fff; }
+
+    /* ════════════════════════════════
+       MOBILE: stacked card list
+    ════════════════════════════════ */
+    @media (max-width: 720px) {
+      .map-container {
+        width: 100%; height: auto;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 0; position: static;
+      }
+
+      /* Bayou center card becomes a normal flow card */
+      .center-card {
+        position: static;
+        transform: none !important;
+        width: 100% !important; height: auto !important;
+        margin-bottom: 20px;
+      }
+      .center-avatar {
+        width: 100%; height: 180px;
+        border-radius: 18px;
+      }
+      .center-label {
+        position: static;
+        transform: none;
+        display: block;
+        text-align: center;
+        margin-top: 12px;
+        font-size: 0.85rem;
+      }
+      .center-card.expanded .center-label { display: none; }
+
+      /* Info overlay fills the card box on mobile */
+      .center-info {
+        position: static;
+        border-radius: 18px;
+        padding: 20px 16px;
+        margin-top: 0;
+        height: auto;
+        opacity: 1 !important;
+        pointer-events: all !important;
+        display: none;
+      }
+      .center-card.expanded .center-info { display: flex; }
+      .center-card.expanded .center-avatar { display: none; }
+
+      /* Orbit members become a vertical list */
+      .orbit-member {
+        position: static;
+        transform: none !important;
+        width: 100%;
+        display: flex; align-items: center; gap: 16px;
+        padding: 12px 16px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        margin-bottom: 10px;
+        transition: background 0.2s ease, opacity 0.3s ease;
+      }
+      .orbit-member.hidden {
+        opacity: 0; pointer-events: none;
+        transform: none !important;
+        height: 0; overflow: hidden;
+        padding: 0; margin: 0; border: none;
+      }
+      .orbit-member:hover { background: rgba(255,255,255,0.07); }
+      .orbit-member:hover .orbit-avatar { transform: none; box-shadow: none; }
+
+      .orbit-avatar {
+        width: 72px; height: 72px;
+        border-radius: 12px; flex-shrink: 0;
+      }
+      .orbit-emoji { top: 4px; right: 4px; font-size: 0.75rem; }
+      .orbit-name {
+        font-size: 0.7rem; letter-spacing: 1.5px;
+        text-align: left; margin-top: 0;
+        white-space: normal;
+        color: rgba(255,255,255,0.8);
+      }
+      .orbit-member:hover .orbit-name { color: #fff; }
+
+      /* Mobile back btn */
+      .back-btn { align-self: center; margin-top: 4px; }
+
+      /* Adjust section margin */
+      .section { padding-bottom: 50px; }
+      .section-title { margin-bottom: 30px; }
+
+      /* Visit counter smaller on mobile */
+      .visit-counter { top: 12px; right: 12px; padding: 8px 12px; gap: 6px; }
+      .visit-icon { width: 18px; height: 18px; }
+      .visit-number { font-size: 0.85rem; }
     }
 
-    .circle-member:hover .member-name {
-      color: #fff;
-    }
-
+    /* ── HONRAS ── */
     .honras-wrap { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-    .honra-pill { font-size: 0.75rem; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.12); border-radius: 100px; padding: 6px 14px; background: rgba(255,255,255,0.03); }
-    
-    footer { text-align: center; padding: 28px 20px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.75rem; color: rgba(255,255,255,0.2); font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+    .honra-pill {
+      font-size: 0.7rem; font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 100px;
+      padding: 6px 14px; background: rgba(255,255,255,0.02);
+    }
+
+    footer {
+      text-align: center; padding: 24px 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.68rem; color: rgba(255,255,255,0.18);
+      font-family: 'Orbitron', sans-serif; letter-spacing: 2px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- SPLASH SCREEN -->
+  <!-- Custom cursor dot -->
+  <div id="cursor-dot"></div>
+
+  <!-- SPLASH -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
       <div class="splash-text">Bayou FC</div>
       <div class="splash-subtitle">Blue Lock Rivals</div>
-      <div class="splash-click">click to enter...</div>
+      <div class="splash-click">clique para entrar...</div>
     </div>
   </div>
 
@@ -404,7 +374,7 @@
     <div class="visit-counter">
       <img src="https://cdn.corenexis.com/f/B664IyfWfyg.png" alt="Olho" class="visit-icon">
       <span class="visit-number" id="visitCount">0</span>
-      <span style="font-size: 0.65rem;">Visitas</span>
+      <span style="font-size:0.6rem;">Visitas</span>
     </div>
 
     <audio id="bgMusic" loop preload="auto"></audio>
@@ -415,11 +385,11 @@
       </div>
       <h1>Bayou FC</h1>
       <p>Blue Lock Rivals</p>
-      <div style="display:flex; justify-content:center; margin-top:4px;">
+      <div style="display:flex;justify-content:center;margin-top:6px;">
         <div class="music-bar">
           <button class="music-btn" id="musicBtn" aria-label="Play/Pause">
             <svg id="iconPlay" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
-            <svg id="iconPause" viewBox="0 0 24 24" fill="currentColor" display="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <svg id="iconPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
           </button>
           <div class="music-info">
             <span class="music-title" id="musicTitle">Ball</span>
@@ -434,32 +404,25 @@
 
     <main class="section">
       <p class="section-title">Elenco Principal</p>
-      
-      <div class="mental-map" id="mentalMap">
-        <!-- Centro (Bayou) -->
-        <div class="center-member" id="centerMember">
+
+      <div class="map-container" id="mapContainer">
+        <!-- CENTER (Bayou) -->
+        <div class="center-card" id="centerCard">
           <div class="center-avatar">
             <img src="https://cdn.corenexis.com/f/OpyRuw6sMZc.png" alt="Bayou">
           </div>
-          <div class="center-name" id="centerName">Bayou</div>
-          <div class="center-desc" id="centerDesc">
-            <p class="center-quote" id="centerQuote">Minhas curvas não erram. O goleiro já sabe que vai tomar, só não sabe de que lado.</p>
-            <div class="center-tags" id="centerTagsContainer">
-              <span class="center-tag">Capitão</span>
-              <span class="center-tag">Winger / CF</span>
-              <span class="center-tag">Skillshot</span>
-              <span class="center-tag">Top 1 Rin OAT</span>
-            </div>
-            <button class="back-btn" onclick="resetMap()">← Voltar</button>
+          <div class="center-label" id="centerLabel">Bayou</div>
+          <div class="center-info" id="centerInfo">
+            <p class="info-quote" id="infoQuote"></p>
+            <div class="info-tags" id="infoTags"></div>
+            <button class="back-btn" id="backBtn">← Voltar</button>
           </div>
         </div>
-
-        <!-- Membros em círculo -->
-        <div class="circle-members" id="circleMembers"></div>
+        <!-- orbit members injected by JS -->
       </div>
     </main>
 
-    <div class="section" style="padding-top: 0;">
+    <div class="section" style="padding-top:0;">
       <p class="section-title">Menções Honrosas ⭐</p>
       <div class="honras-wrap" id="honrasWrap"></div>
     </div>
@@ -468,8 +431,19 @@
   </div>
 
   <script>
-    const MUSICAS = [
-      { url: "https://files.catbox.moe/0brc66.mp3", nome: "Ball", artista: "Jugsta" },
+    /* ── CURSOR DOT ── */
+    (function() {
+      var dot = document.getElementById("cursor-dot");
+      if (!dot) return;
+      document.addEventListener("mousemove", function(e) {
+        dot.style.left = e.clientX + "px";
+        dot.style.top  = e.clientY + "px";
+      });
+    })();
+
+    /* ── DATA ── */
+    var MUSICAS = [
+      { url: "https://files.catbox.moe/0brc66.mp3", nome: "Ball",    artista: "Jugsta" },
       { url: "https://files.catbox.moe/ff10i2.mp3", nome: "Track 1", artista: "Artist" },
       { url: "https://files.catbox.moe/cipjb4.mp3", nome: "Track 2", artista: "Artist" },
       { url: "https://files.catbox.moe/o7hv7h.mp3", nome: "Track 3", artista: "Artist" },
@@ -478,217 +452,170 @@
       { url: "https://files.catbox.moe/eyr45s.mp3", nome: "Track 6", artista: "Artist" }
     ];
 
-    const bayouData = {
+    var bayouData = {
       name: "Bayou",
       quote: "Minhas curvas não erram. O goleiro já sabe que vai tomar, só não sabe de que lado.",
-      tags: ["Capitão", "Winger / CF", "Skillshot", "Top 1 Rin OAT"]
+      tags: ["Capitão", "Winger / CF", "Skillshot", "Top 1 Rin OAT", "Membro OG"]
     };
 
-    let currentMusicIndex = -1;
+    var players = [
+      { name: "Aspas",          emoji: "🐶", img: "https://cdn.corenexis.com/f/DkqK720z4o2.png", quote: "O Chig não pensa, ele corre. Antes de você piscar, o gol já entrou.",              tags: ["CF", "Melhor M1", "Best Chig", "Shidou", "Membro OG"] },
+      { name: "Less / form exe",emoji: "🔒", img: "https://cdn.corenexis.com/f/VHUXZwMBakh.png", quote: "Nenhuma bola passa enquanto eu estiver aqui. Pode armar, pode rezar.",             tags: ["GK", "Winger Linha Chig", "Muralha", "Best Gagamaru"] },
+      { name: "Kasee",          emoji: "🦀", img: "https://cdn.corenexis.com/f/ib78mMkf6eI.png", quote: "A bola fica onde eu quero. Sempre. Sem exceção.",                                  tags: ["Membro OG", "Winger Híbrido", "Best Nagi"] },
+      { name: "Manel Gomes",    emoji: "🔧", img: "https://cdn.corenexis.com/f/cpjcK43pwf0.png", quote: "Quando o time trava, eu apareço. Conserto tudo e sumo. Os que sabem, sabem.",      tags: ["CM", "Winger Joker", "Best Don Lorenzo BLR"] },
+      { name: "Winter",         emoji: "🤝", img: "https://cdn.corenexis.com/f/q64E6Iukk9B.png", quote: "Bon:dade não é fraqueza. É o meu estilo de jogo.",                                 tags: ["CM", "Iga Aiku", "Bon:dade"] },
+      { name: "Shy",            emoji: "🎭", img: "https://cdn.corenexis.com/f/sFP3FU4koSe.png", quote: "Eu me adapto ao que o jogo pede. Atacar, defender, não importa.",                  tags: ["Winger Def", "SAE", "Charles", "Técnico do Time"] },
+      { name: "Gengar",         emoji: "😤", img: "https://cdn.corenexis.com/f/3v7APrrjJqZ.png", quote: "Pode me ignorar o jogo inteiro. Só não me ignore no momento que importa.",         tags: ["Winger", "Nagi", "Decisivo", "Def + Ataque"] }
+    ];
 
-    function getRandomMusic() {
-      return Math.floor(Math.random() * MUSICAS.length);
-    }
+    var honras = ["Jonathan", "Gnom", "Kurona", "Shu", "Felps", "Crazy", "Killer", "Loiro"];
 
-    function playRandomMusic() {
-      const audio = document.getElementById("bgMusic");
-      currentMusicIndex = getRandomMusic();
-      const musica = MUSICAS[currentMusicIndex];
-      
-      audio.src = musica.url;
-      audio.volume = 0.4;
-      
-      document.getElementById("musicTitle").textContent = musica.nome;
-      document.getElementById("musicArtist").textContent = musica.artista;
-      
-      audio.play().then(() => {
-        setPlaying(true);
-      }).catch(err => console.log("Erro ao tocar:", err));
-    }
+    /* ── STATE ── */
+    var expanded = false;
+    var playing  = false;
 
-    function resetMap() {
-      document.getElementById("centerMember").classList.remove("expanded");
-      document.getElementById("centerName").textContent = bayouData.name;
-      document.getElementById("centerQuote").textContent = bayouData.quote;
-      document.getElementById("centerTagsContainer").innerHTML = bayouData.tags.map(t => `<span class="center-tag">${t}</span>`).join('');
-      
-      document.querySelectorAll(".circle-member").forEach(m => {
-        m.style.opacity = "1";
-        m.classList.remove("hidden");
-      });
-    }
+    /* ── SPLASH ── */
+    var splash      = document.getElementById("splashScreen");
+    var mainContent = document.getElementById("mainContent");
 
-    // SPLASH SCREEN CLICK
-    document.getElementById("splashScreen").addEventListener("click", function() {
-      playRandomMusic();
+    splash.addEventListener("click", function() {
+      splash.classList.add("hiding");
+      setTimeout(function() {
+        splash.style.display = "none";
+        mainContent.classList.add("visible");
+        playRandomMusic();
+      }, 600);
     });
 
-    // CONTADOR DE VISITAS
-    function initVisitCounter() {
-      var visits = localStorage.getItem('bayouVisits') || '0';
-      visits = parseInt(visits) + 1;
-      localStorage.setItem('bayouVisits', visits);
-      document.getElementById('visitCount').textContent = visits;
-    }
-    initVisitCounter();
+    /* ── VISIT COUNTER ── */
+    (function() {
+      var v = (parseInt(localStorage.getItem("bayouVisits") || "0") + 1);
+      localStorage.setItem("bayouVisits", v);
+      document.getElementById("visitCount").textContent = v;
+    })();
 
-    var audio = document.getElementById("bgMusic");
-    var btn = document.getElementById("musicBtn");
-    var dot = document.getElementById("musicDot");
-    var iconPlay = document.getElementById("iconPlay");
+    /* ── MUSIC ── */
+    var audio     = document.getElementById("bgMusic");
+    var btnMusic  = document.getElementById("musicBtn");
+    var dot2      = document.getElementById("musicDot");
+    var iconPlay  = document.getElementById("iconPlay");
     var iconPause = document.getElementById("iconPause");
-    var playing = false;
 
     function setPlaying(state) {
       playing = state;
-      if (playing) {
-        iconPlay.setAttribute("display", "none");
-        iconPause.setAttribute("display", "");
-        dot.classList.remove("paused");
-      } else {
-        iconPlay.setAttribute("display", "");
-        iconPause.setAttribute("display", "none");
-        dot.classList.add("paused");
-      }
+      iconPlay.style.display  = state ? "none" : "";
+      iconPause.style.display = state ? "" : "none";
+      dot2.classList.toggle("paused", !state);
     }
 
-    btn.addEventListener("click", function() {
-      if (playing) { 
-        audio.pause(); 
-        setPlaying(false); 
-      } else { 
-        if (audio.src === "") {
-          playRandomMusic();
-        } else {
-          audio.play();
-          setPlaying(true);
-        }
+    function playRandomMusic() {
+      var idx    = Math.floor(Math.random() * MUSICAS.length);
+      var musica = MUSICAS[idx];
+      audio.src    = musica.url;
+      audio.volume = 0.4;
+      document.getElementById("musicTitle").textContent  = musica.nome;
+      document.getElementById("musicArtist").textContent = musica.artista;
+      audio.play().then(function(){ setPlaying(true); }).catch(function(){});
+    }
+
+    btnMusic.addEventListener("click", function() {
+      if (playing) { audio.pause(); setPlaying(false); }
+      else {
+        if (!audio.src) playRandomMusic();
+        else audio.play().then(function(){ setPlaying(true); }).catch(function(){});
       }
     });
 
-    audio.addEventListener("ended", function() {
-      playRandomMusic();
-    });
-
+    audio.addEventListener("ended", playRandomMusic);
     setPlaying(false);
 
-    const players = [
-      {
-        name: "Aspas",
-        emoji: "🐶",
-        img: "https://cdn.corenexis.com/f/DkqK720z4o2.png",
-        quote: "O Chig não pensa, ele corre. Antes de você piscar, o gol já entrou.",
-        tags: ["CF", "Melhor M1", "Best Chig", "Shidou"]
-      },
-      {
-        name: "Less / form exe",
-        emoji: "🔒",
-        img: "https://cdn.corenexis.com/f/VHUXZwMBakh.png",
-        quote: "Nenhuma bola passa enquanto eu estiver aqui. Pode armar, pode rezar.",
-        tags: ["GK", "Winger Linha Chig", "Muralha", "Best Gagamaru"]
-      },
-      {
-        name: "Kasee",
-        emoji: "🦀",
-        img: "https://cdn.corenexis.com/f/ib78mMkf6eI.png",
-        quote: "A bola fica onde eu quero. Sempre. Sem exceção.",
-        tags: ["Membro OG", "Winger Híbrido", "Best Nagi"]
-      },
-      {
-        name: "Manel Gomes",
-        emoji: "🔧",
-        img: "https://cdn.corenexis.com/f/cpjcK43pwf0.png",
-        quote: "Quando o time trava, eu apareço. Conserto tudo e sumo. Os que sabem, sabem.",
-        tags: ["CM", "Winger Joker", "Best Don Lorenzo BLR"]
-      },
-      {
-        name: "Winter",
-        emoji: "🤝",
-        img: "https://cdn.corenexis.com/f/q64E6Iukk9B.png",
-        quote: "Bon:dade não é fraqueza. É o meu estilo de jogo.",
-        tags: ["CM", "Iga Aiku", "Bon:dade"]
-      },
-      {
-        name: "Shy",
-        emoji: "🎭",
-        img: "https://cdn.corenexis.com/f/sFP3FU4koSe.png",
-        quote: "Eu me adapto ao que o jogo pede. Atacar, defender, não importa. O técnico do time faz o que for necessário.",
-        tags: ["Winger Def", "SAE", "Charles", "Técnico do Time"]
-      },
-      {
-        name: "Gengar",
-        emoji: "😤",
-        img: "https://cdn.corenexis.com/f/3v7APrrjJqZ.png",
-        quote: "Pode me ignorar o jogo inteiro. Só não me ignore no momento que importa.",
-        tags: ["Winger", "Nagi", "Decisivo", "Def + Ataque"]
+    /* ── BUILD MAP ── */
+    var container = document.getElementById("mapContainer");
+    var isMobile  = window.innerWidth <= 720;
+    var CX = 340, CY = 340, R = 260;
+
+    players.forEach(function(player, i) {
+      var el = document.createElement("div");
+      el.className = "orbit-member";
+      el.dataset.index = i;
+
+      if (!isMobile) {
+        var angle = (Math.PI * 2 / players.length) * i - Math.PI / 2;
+        var x = CX + Math.cos(angle) * R;
+        var y = CY + Math.sin(angle) * R;
+        el.style.left = x + "px";
+        el.style.top  = y + "px";
       }
-    ];
 
-    // Criar membros em círculo
-    const circleMembers = document.getElementById("circleMembers");
-    const totalMembers = players.length;
-    const angleSlice = (Math.PI * 2) / totalMembers;
-    const radius = 280;
+      el.innerHTML =
+        '<div class="orbit-avatar">' +
+          '<img src="' + player.img + '" alt="' + player.name + '" loading="lazy">' +
+          '<span class="orbit-emoji">' + player.emoji + '</span>' +
+        '</div>' +
+        '<div class="orbit-name">' + player.name + '</div>';
 
-    players.forEach((player, index) => {
-      const angle = angleSlice * index;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-
-      const memberDiv = document.createElement("div");
-      memberDiv.className = "circle-member";
-      memberDiv.style.left = `calc(50% + ${x}px)`;
-      memberDiv.style.top = `calc(50% + ${y}px)`;
-      memberDiv.style.transform = `translate(-50%, -50%)`;
-
-      const tagsHtml = player.tags.map(t => `<span class="center-tag">${t}</span>`).join('');
-
-      memberDiv.innerHTML = `
-        <div class="member-avatar">
-          <img src="${player.img}" alt="${player.name}" loading="lazy">
-          <span class="member-emoji">${player.emoji}</span>
-        </div>
-        <div class="member-name">${player.name}</div>
-      `;
-
-      memberDiv.addEventListener("click", function(e) {
+      el.addEventListener("click", function(e) {
         e.stopPropagation();
-        
-        // Esconder esse membro
-        memberDiv.style.opacity = "0";
-        memberDiv.style.pointerEvents = "none";
-        
-        // Esconder outros membros
-        document.querySelectorAll(".circle-member").forEach(m => {
-          if (m !== memberDiv) {
-            m.classList.add("hidden");
-          }
-        });
-
-        // Atualizar dados do center com o jogador
-        document.getElementById("centerName").textContent = player.name;
-        document.getElementById("centerQuote").textContent = player.quote;
-        document.getElementById("centerTagsContainer").innerHTML = tagsHtml;
-        
-        // Expandir center member
-        document.getElementById("centerMember").classList.add("expanded");
+        showPlayer(player);
       });
 
-      circleMembers.appendChild(memberDiv);
+      container.appendChild(el);
     });
 
-    // Centro member click
-    document.getElementById("centerMember").addEventListener("click", function(e) {
+    /* ── CENTER CARD LOGIC ── */
+    var centerCard  = document.getElementById("centerCard");
+    var centerLabel = document.getElementById("centerLabel");
+    var infoQuote   = document.getElementById("infoQuote");
+    var infoTagsEl  = document.getElementById("infoTags");
+    var backBtn     = document.getElementById("backBtn");
+
+    function renderCenter(data) {
+      centerLabel.textContent = data.name;
+      infoQuote.textContent   = data.quote;
+      infoTagsEl.innerHTML    = data.tags.map(function(t){ return '<span class="info-tag">' + t + '</span>'; }).join("");
+    }
+
+    function collapseOrbit(hide) {
+      document.querySelectorAll(".orbit-member").forEach(function(m) {
+        if (hide) m.classList.add("hidden");
+        else      m.classList.remove("hidden");
+      });
+    }
+
+    function showPlayer(player) {
+      renderCenter(player);
+      collapseOrbit(true);
+      centerCard.classList.add("expanded");
+      expanded = true;
+    }
+
+    function resetMap() {
+      renderCenter(bayouData);
+      centerCard.classList.remove("expanded");
+      expanded = false;
+      requestAnimationFrame(function() {
+        collapseOrbit(false);
+      });
+    }
+
+    centerCard.addEventListener("click", function(e) {
       if (e.target.closest(".back-btn")) return;
-      
-      if (!this.classList.contains("expanded")) {
-        // Expandir info do Bayou
-        document.querySelectorAll(".circle-member").forEach(m => m.classList.add("hidden"));
-        this.classList.add("expanded");
+      if (!expanded) {
+        renderCenter(bayouData);
+        collapseOrbit(true);
+        centerCard.classList.add("expanded");
+        expanded = true;
       }
     });
 
-    const honras = ["Jonathan", "Gnom", "Kurona", "Shu", "Felps", "Crazy", "Killer", "Loiro"];
+    backBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      resetMap();
+    });
+
+    renderCenter(bayouData);
+
+    /* ── HONRAS ── */
     var honrasWrap = document.getElementById("honrasWrap");
     honras.forEach(function(name) {
       var pill = document.createElement("span");
